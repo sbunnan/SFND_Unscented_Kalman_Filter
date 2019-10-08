@@ -4,8 +4,12 @@
 #include "Eigen/Dense"
 #include "measurement_package.h"
 
-class UKF {
- public:
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
+
+class UKF
+{
+public:
   /**
    * Constructor
    */
@@ -40,7 +44,6 @@ class UKF {
    * @param meas_package The measurement at k+1
    */
   void UpdateRadar(MeasurementPackage meas_package);
-
 
   // initially set to false, set to true in first call of ProcessMeasurement
   bool is_initialized_;
@@ -82,7 +85,7 @@ class UKF {
   double std_radphi_;
 
   // Radar measurement noise standard deviation radius change in m/s
-  double std_radrd_ ;
+  double std_radrd_;
 
   // Weights of sigma points
   Eigen::VectorXd weights_;
@@ -95,6 +98,17 @@ class UKF {
 
   // Sigma point spreading parameter
   double lambda_;
+
+private:
+  void AugmentedSigmaPoints(MatrixXd *Xsig_out);
+  void SigmaPointPrediction(MatrixXd *Xsig_aug, double delta_t);
+  void PredictMeanAndCovariance();
+
+  void PredictRadarMeasurement(VectorXd *z_out, MatrixXd *S_out, MatrixXd *Zsig_out, int n_z);
+  void UpdateRadarState(VectorXd *z_pred_input, int n_z, MatrixXd *S_input, MatrixXd *Zsig_input, MeasurementPackage meas_package);
+
+  void PredictLidarMeasurement(VectorXd *z_out, MatrixXd *S_out, MatrixXd *Zsig_out, int n_z);
+  void UpdateLidarState(VectorXd *z_pred_input, int n_z, MatrixXd *S_input, MatrixXd *Zsig_input, MeasurementPackage meas_package);
 };
 
-#endif  // UKF_H
+#endif // UKF_H
